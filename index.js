@@ -30,8 +30,18 @@ app.get("/", (req, res) => {
         console.log(error);
     }
 });
-app.post("/add-task", (req, res)=>{
-    
+app.get("/all-task", async (req, res)=>{
+    const email = req.query.email
+    const filter = {
+        createdBy: email
+    }
+    const result = await tasks.find(filter)
+    res.send(result)
+})
+app.post("/add-task", async (req, res)=>{
+    const task = req.body;
+    const result = await tasks.insertOne(task)
+    res.send(result)
 })
 app.listen(port,()=>{
     console.log(`Listing... ${port}`);
