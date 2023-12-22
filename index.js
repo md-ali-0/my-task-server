@@ -21,37 +21,49 @@ const client = new MongoClient(mongoURI, {
     },
 });
 
-const tasks = client.db('tasksDB').collection('tasks')
+const tasks = client.db("tasksDB").collection("tasks");
 
 app.get("/", (req, res) => {
     try {
-        res.send("Server is Running")
+        res.send("Server is Running");
     } catch (error) {
         console.log(error);
     }
 });
-app.get("/all-task", async (req, res)=>{
-    const email = req.query.email
-    let filter = {}
+app.get("/all-task", async (req, res) => {
+    const email = req.query.email;
+    let filter = {};
     if (email) {
-        filter.createdBy = email
+        filter.createdBy = email;
     }
-    const result = await tasks.find(filter).toArray()
-    res.send(result)
-})
-app.post("/add-task", async (req, res)=>{
+    const result = await tasks.find(filter).toArray();
+    res.send(result);
+});
+app.post("/add-task", async (req, res) => {
     const task = req.body;
-    const result = await tasks.insertOne(task)
-    res.send(result)
-})
-app.delete("/delete-task/:id", async (req, res)=>{
+    const result = await tasks.insertOne(task);
+    res.send(result);
+});
+app.delete("/delete-task/:id", async (req, res) => {
     const id = req.params.id;
     const filter = {
-        _id: new ObjectId(id)
-    }
-    const result = await tasks.deleteOne(filter)
-    res.send(result)
-})
-app.listen(port,()=>{
+        _id: new ObjectId(id),
+    };
+    const result = await tasks.deleteOne(filter);
+    res.send(result);
+});
+app.put("/update-task/:id", async (req, res) => {
+    const id = req.params.id;
+    const status = req.body;
+    const filter = {
+        _id: new ObjectId(id),
+    };
+    const updateDoc = {
+        $set: status,
+    };
+    const result = await tasks.updateOne(filter, updateDoc);
+    res.send(result);
+});
+app.listen(port, () => {
     console.log(`Listing... ${port}`);
-})
+});
