@@ -1,7 +1,7 @@
 import cors from "cors";
 import { config } from "dotenv";
 import express from "express";
-import { MongoClient, ServerApiVersion } from "mongodb";
+import { MongoClient, ObjectId, ServerApiVersion } from "mongodb";
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -32,15 +32,24 @@ app.get("/", (req, res) => {
 });
 app.get("/all-task", async (req, res)=>{
     const email = req.query.email
-    const filter = {
-        createdBy: email
+    let filter = {}
+    if (email) {
+        filter.createdBy = email
     }
-    const result = await tasks.find(filter)
+    const result = await tasks.find(filter).toArray()
     res.send(result)
 })
 app.post("/add-task", async (req, res)=>{
     const task = req.body;
     const result = await tasks.insertOne(task)
+    res.send(result)
+})
+app.delete("/delete-task/:id", async (req, res)=>{
+    const id = req.params.id;
+    const filter = {
+        _id: new ObjectId(id)
+    }
+    const result = await tasks.deleteOne(filter)
     res.send(result)
 })
 app.listen(port,()=>{
